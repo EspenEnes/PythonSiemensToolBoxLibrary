@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from Step7V5 import *
-from getProjectFolder import getProjectfolder
-from project import Project
-from SimaticDataTypes import ProjectType
+from SiemensToolBox.Step7V5 import *
+from SiemensToolBox.getProjectFolder import getProjectfolder
+from SiemensToolBox.project import Project
+from SiemensToolBox.SimaticDataTypes import ProjectType
 
 
 

@@ -1,6 +1,6 @@
 from dbfread import DBF
 from dbfread import exceptions
-from SimaticDataTypes import CpFolder
+from SiemensToolBox.SimaticDataTypes import CpFolder
 
 
 

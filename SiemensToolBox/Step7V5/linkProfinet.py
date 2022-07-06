@@ -1,4 +1,4 @@
-from SimaticDataTypes import PLCType
+from SiemensToolBox.SimaticDataTypes import PLCType
 from dbfread import DBF
 
 

@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes import PLCType, CpFolder
+from SiemensToolBox.SimaticDataTypes import PLCType, CpFolder
 from dataclasses import dataclass
 
 @dataclass

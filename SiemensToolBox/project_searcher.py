@@ -1,8 +1,8 @@
 import zipfile
 import os
-from readProjectHeader import readProjectHeader
-from readProjectEncoding import readProjectEncoding
-from Step7V5.project import ProjectV5
+from .readProjectHeader import readProjectHeader
+from .readProjectEncoding import readProjectEncoding
+from .Step7V5.project import ProjectV5
 
 
 class Step7Finder:

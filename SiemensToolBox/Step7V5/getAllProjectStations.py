@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes import StationType, StationConfigurationFolder, PLCType, CpFolder
+from SiemensToolBox.SimaticDataTypes import StationType, StationConfigurationFolder
 
 """from projectFiles import Step7ProjectV5"""
 

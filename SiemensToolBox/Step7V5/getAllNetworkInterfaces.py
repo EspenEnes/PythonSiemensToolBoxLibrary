@@ -1,6 +1,6 @@
 import re
-from SimaticDataTypes.NetworkInterface import EthernetInterface, MpiProfibusInterface
-from SimaticDataTypes.s7Types import interface
+from SiemensToolBox.SimaticDataTypes.NetworkInterface import EthernetInterface, MpiProfibusInterface
+from SiemensToolBox.SimaticDataTypes.s7Types import interface
 
 
 def getAllMPI(parent=None, projectFolder=None):

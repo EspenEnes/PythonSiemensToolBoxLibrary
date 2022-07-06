@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes import CPUFolder, PLCType, StationConfigurationFolder
+from SiemensToolBox.SimaticDataTypes import CPUFolder, PLCType, StationConfigurationFolder
 import os
 
 

@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes import SymbolTable
+from SiemensToolBox.SimaticDataTypes import SymbolTable
 import os
 
 def linkSymbolTableWithProgrammFolder(projectFolder, s7ProgrammFolders ):

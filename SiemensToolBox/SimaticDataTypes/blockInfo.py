@@ -2,8 +2,7 @@ from dataclasses import dataclass, field
 from .s7Types import BlockType
 from .blockBytes import BlockBytes
 from dbfread import DBF
-from Step7V5.getLayout import Getlayout
-from .blockLayout import BlockLayout
+from SiemensToolBox.Step7V5.getLayout import Getlayout
 
 
 @dataclass

@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes import BlockOfflineFolder
+from SiemensToolBox.SimaticDataTypes import BlockOfflineFolder
 
 
 def getAllBlocksOfflineFolders(projectFolder, encoding="ISO-8859-1"):

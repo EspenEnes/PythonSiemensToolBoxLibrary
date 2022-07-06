@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import codecs
-from readProjectHeader import readProjectHeader
+from .readProjectHeader import readProjectHeader
 import os
 
 
@@ -21,6 +21,7 @@ class Project():
         if (not self.projectName) and self.projectFile.lower().endswith(".s7p"):
             with open(self.projectFile, "rb") as f:
                 self.projectName = readProjectHeader(f)
+
 
         if (not self.projectPath) and self.projectFile.lower().endswith(".s7p"):
             self.projectPath = os.path.split(self.projectFile)[0]

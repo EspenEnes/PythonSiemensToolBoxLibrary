@@ -1,5 +1,5 @@
 from dbfread import DBF
-from SimaticDataTypes.s7ProgramFolder import S7ProgrammFolder
+from SiemensToolBox.SimaticDataTypes.s7ProgramFolder import S7ProgrammFolder
 
 
 def getAllProgramFolders(projectFolder, encoding="ISO-8859-1"):
