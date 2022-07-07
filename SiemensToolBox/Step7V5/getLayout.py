@@ -63,14 +63,14 @@ class Getlayout():
                 array = re.compile("^ARRAY\s+\[(\d+)\s+..\s+(\d+)\s+]\s+(OF.*)").search(_type)
 
                 if FB:
-                    layout = self._parent.getLayout(blockName=f"FB{FB.group(1)}").layout
+                    layout = self._parent.getBlockLayout(f"FB{FB.group(1)}").layout
                     root[name] = layout
                 elif UDT:
-                    layout = self._parent.getLayout(blockName=f"UDT{UDT.group(1)}").layout
+                    layout = self._parent.getBlockLayout(f"UDT{UDT.group(1)}").layout
                     root[name] = layout
 
                 elif SFB:
-                    layout = self._parent.getLayout(blockName=f"SFB{SFB.group(1)}").layout
+                    layout = self._parent.getBlockLayout(f"SFB{SFB.group(1)}").layout
                     root[name] = layout
                 elif array:
                     start = array.group(1)
@@ -97,15 +97,15 @@ class Getlayout():
                         SFB = re.compile("^SFB\s(\d+)").search(_type)
 
                         if FB:
-                            layout = self._parent.GetInterfaceOfDB(blkName=f"FB{UDT.group(1)}").layout
+                            layout = self._parent.getBlockLayout(f"FB{UDT.group(1)}").layout
                             for item in range(int(start), int(stop) + 1):
                                 root[f"{name}[{item}]"] = layout
                         elif UDT:
-                            layout = self._parent.GetInterfaceOfDB(blkName=f"UDT{UDT.group(1)}").layout
+                            layout = self._parent.getBlockLayout(f"UDT{UDT.group(1)}").layout
                             for item in range(int(start), int(stop) + 1):
                                 root[f"{name}[{item}]"] = layout
                         elif SFB:
-                            layout = self._parent.GetInterfaceOfDB(blkName=f"SFB{UDT.group(1)}").layout
+                            layout = self._parent.getBlockLayout(f"SFB{UDT.group(1)}").layout
                             for item in range(int(start), int(stop) + 1):
                                 root[f"{name}[{item}]"] = layout
                         else:

@@ -15,6 +15,7 @@ class BlockInfo():
     knowHowProtection: bool = field(init=True, default=False, repr=False)
     isInstance: bool = field(init=True, default=False, repr=False)
     _folder: str = field(init=True, default=None, repr=False)
+    _parent: any = field(init=True, default=None, repr=False)
 
 
     @property
@@ -129,7 +130,7 @@ class BlockInfo():
 
     @property
     def layout(self):
-        if not self.blockBytes.blkinterface: return None
+        if not self.blockBytes.blkinterface: return Getlayout(self._parent, [])
         rows = [row.strip() for row in self.blockBytes.blkinterface.split("\n") if len(row.strip()) > 0]
-        root = Getlayout(self, rows)
+        root = Getlayout(self._parent, rows)
         return root

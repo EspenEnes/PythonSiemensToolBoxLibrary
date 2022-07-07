@@ -4,7 +4,7 @@ from .s7Types import interface
 
 @dataclass
 class  EthernetInterface:
-    Type: interface = field(init=True, default=interface.IP, repr=True)
+    Type: interface = field(init=True, default=interface.IP, repr=True, compare=True)
     Name: str = field(init=True, default=None, repr=True)
     Address: str = field(init=True, default=None, repr=True)
     _id: int = field(init=True, default=None, repr=False)

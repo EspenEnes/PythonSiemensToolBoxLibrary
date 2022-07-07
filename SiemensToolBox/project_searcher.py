@@ -29,7 +29,7 @@ class Step7Finder:
         return record
 
     @classmethod
-    def search(cls, path=r"C:\Users\enese\Documents\Jobb-Mappa"):
+    def search(cls, path=r"C:\Users\enese\Documents\Jobb-Mappa\Askeladden ( R5547)\aaaaa"):
 
         for root, dirs, files in os.walk(path):
             for file in files:

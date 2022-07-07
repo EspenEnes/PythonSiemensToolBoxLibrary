@@ -35,7 +35,10 @@ class BlockOfflineFolder:
         return retval
 
     def getBlockLayout(self, input):
-        if type(input) == BlockInfo:
+        if not self._blocklist_loaded:
+            _ = self.blockList
+
+        if type(input) == type(BlockInfo):
             blkinfo = input
         elif type(input) == str:
             try:
@@ -69,7 +72,7 @@ class BlockOfflineFolder:
                                    BlockType.UDT.value]:
                 tmp = BlockInfo(int(row["ID"]))
                 tmp._folder = self.folder
-                tmp.parent = self
+                tmp._parent = self
                 tmp.blockNumber = int(row["NUMMER"])
                 tmp.blockType = BlockType(int(row["TYP"]))
                 blocks[int(row["ID"])] = tmp

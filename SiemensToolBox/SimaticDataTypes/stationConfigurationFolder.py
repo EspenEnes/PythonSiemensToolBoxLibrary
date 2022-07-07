@@ -13,6 +13,13 @@ class StationConfigurationFolder:
     def __post_init__(self):
         self.stationType = StationType(self.objTyp)
 
+    def getAllNetworkInterfaces(self):
+        tmpInterfaces = list()
+        for module in self.modules:
+            tmpInterfaces.append(module.NetworkInterfaces)
+        return [val for sublist in tmpInterfaces for val in sublist]
+
+
 
     # def __repr__(self):
     #     return self.Name
