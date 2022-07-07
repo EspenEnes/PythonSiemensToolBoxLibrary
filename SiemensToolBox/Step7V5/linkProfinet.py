@@ -42,6 +42,8 @@ def linkProfinetWithCpuCp(projectFolder, cpuFolders, cpFolders, networkInterface
 
 
         if CP:
+            networkInterfaces[networkId]._parent = CP
             CP.NetworkInterfaces.append(networkInterfaces[networkId])
         if CPU:
+            networkInterfaces[networkId]._parent = CPU
             CPU.NetworkInterfaces.append(networkInterfaces[networkId])

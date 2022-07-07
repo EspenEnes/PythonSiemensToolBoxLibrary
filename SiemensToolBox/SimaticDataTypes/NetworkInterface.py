@@ -8,6 +8,7 @@ class  EthernetInterface:
     Name: str = field(init=True, default=None, repr=True)
     Address: str = field(init=True, default=None, repr=True)
     _id: int = field(init=True, default=None, repr=False)
+    _parent: any = field(init=True, default=None, repr=False)
 
     UseIso: bool = field(init=True, default=False, repr=False)
     PhysicalAddress: str = field(init=True, default="", repr=False)
