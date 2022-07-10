@@ -172,10 +172,17 @@ class Getlayout():
 
             if item:
                 name = item.group(1)
+                #is there a struct change??
                 if oldname:
                     dirty = ".".join(name.split(".")[:-1]) != ".".join(oldname.split(".")[:-1])
-                if item.group(2) != pitem.group(2) and item.group(1).endswith("]") :
+                #we have a typechange into a array
+                if (item.group(2) != pitem.group(2)) and item.group(1).endswith("]") :
                     dirty = True
+                elif not dirty:
+                    if item.group(2) == "BYTE":
+                        if adress % 8 != 0:
+                            adress += (8 - (adress % 8))
+
 
                 _type = item.group(2)
 
