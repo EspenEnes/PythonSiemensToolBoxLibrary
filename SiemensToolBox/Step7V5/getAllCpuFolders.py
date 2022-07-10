@@ -6,8 +6,10 @@ import os
 # todo: Needs refactoring, duplicate codes
 
 
-def getAllCpuFolders(projectFolder, stations):
+def getAllCpuFolders(projectFolder, stations, encoder):
     cpufolders = {}
+    encoding = encoder[0].name
+    print(encoding)
 
 
     """CPU MpiDp 300 Folders"""
@@ -71,14 +73,14 @@ def getAllCpuFolders(projectFolder, stations):
 
     """ Get The CPU(ET200S)"""
     if os.path.isfile(f"{projectFolder}\\hOmSave7\\s7hkcomx\\HOBJECT1.DBF"):
-        dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hkcomx\\HOBJECT1.DBF")
+        dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hkcomx\\HOBJECT1.DBF", raw=True)
 
         for row in dbf.records:
             try:
                 cpu = cpufolders[int(row["ID"])]
-                cpu.name = row["NAME"].decode("ISO-8859-1").replace("\0", "").strip()
+                cpu.name = row["NAME"].decode(encoding).replace("\0", "").strip()
                 cpu.rack = int(row["SUBSTATN"])
-                cpu.slot = int[row["MODULN"]]
+                cpu.slot = int(row["MODULN"])
             except KeyError:
                 pass
 
@@ -89,7 +91,7 @@ def getAllCpuFolders(projectFolder, stations):
         for row in dbf.records:
             try:
                 cpu = cpufolders[int(row["ID"])]
-                cpu.name = row["NAME"].decode("ISO-8859-1").replace("\0", "").strip()
+                cpu.name = row["NAME"].decode(encoding).replace("\0", "").strip()
                 cpu.rack = int(row["SUBSTATN"])
                 cpu.slot = int(row["MODULN"])
             except KeyError:
@@ -97,12 +99,12 @@ def getAllCpuFolders(projectFolder, stations):
 
     """ Get The CPU(400)..."""
     if os.path.isfile(f"{projectFolder}\\hOmSave7\\s7hk41ax\\HOBJECT1.DBF"):
-        dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hk41ax\\HOBJECT1.DBF")
+        dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hk41ax\\HOBJECT1.DBF", raw=True)
 
         for row in dbf.records:
             try:
                 cpu = cpufolders[int(row["ID"])]  # todo: sjekk om 400cpu
-                cpu.name = row["NAME"].decode("ISO-8859-1").replace("\0", "").strip()
+                cpu.name = row["NAME"].decode(encoding).replace("\0", "").strip()
                 cpu.rack = int(row["SUBSTATN"])
                 cpu.slot = int(row["MODULN"])
             except KeyError:

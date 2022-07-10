@@ -27,7 +27,7 @@ class ProjectV5(Project):
         """Get Hardware part of project"""
         self.stations = getAllProjectStations(self.projectPath)
         self._DpFolders = getAllDPfolders(self.projectPath)
-        self._cpuFolder = getAllCpuFolders(self.projectPath, self.stations)
+        self._cpuFolder = getAllCpuFolders(self.projectPath, self.stations, encoder=self.projectEncoding)
         self._cpFolder = getAllCommunicationProcessors(self.projectPath, self.stations)
         self._networkInterfaces = getAllNetworkInterfaces(self.projectPath)
         linkProfinetWithCpuCp(self.projectPath, self._cpuFolder, self._cpFolder, self._networkInterfaces)
