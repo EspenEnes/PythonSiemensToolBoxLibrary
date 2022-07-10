@@ -174,7 +174,7 @@ class Getlayout():
                 name = item.group(1)
                 if oldname:
                     dirty = ".".join(name.split(".")[:-1]) != ".".join(oldname.split(".")[:-1])
-                if item.group(2) != pitem.group(2):
+                if item.group(2) != pitem.group(2) and item.group(2).endswith("]") :
                     dirty = True
 
                 _type = item.group(2)
