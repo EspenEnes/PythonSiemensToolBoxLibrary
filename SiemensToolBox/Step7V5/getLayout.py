@@ -162,15 +162,23 @@ class Getlayout():
                  "TIME": 32,
                  "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64}
 
-        for ixRows, row in enumerate(rows):
+        ixRows = 0
+        while ixRows < len(rows):
+            row = rows[ixRows]
+
             item = re.compile("(^.*)\s:\s(.*)(?:\s;)*").search(row)
+
+            pitem = re.compile("(^.*)\s:\s(.*)(?:\s;)*").search(rows[ixRows - 1])
 
             if item:
                 name = item.group(1)
                 if oldname:
                     dirty = ".".join(name.split(".")[:-1]) != ".".join(oldname.split(".")[:-1])
+                if item.group(2) != pitem.group(2):
+                    dirty = True
 
                 _type = item.group(2)
+
                 if _type in Types.keys() or _type.startswith("STRING"):
                     if _type not in ["BOOL", "BYTE"] or dirty:
                         if adress % 8 != 0:
@@ -178,9 +186,11 @@ class Getlayout():
                         if (adress // 8) % 2 != 0:
                             adress += 8
 
+
                 oldname = name
                 outData.append([f"{adress // 8}.{adress % 8}", name, _type])
                 adress += checkType(_type, Types)
+                ixRows += 1
         return outData
 
 
