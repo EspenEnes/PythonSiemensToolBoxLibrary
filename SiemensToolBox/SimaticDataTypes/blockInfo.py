@@ -17,6 +17,11 @@ class BlockInfo():
     _folder: str = field(init=True, default=None, repr=False)
     _parent: any = field(init=True, default=None, repr=False)
 
+    @property
+    def syblolName(self):
+        symbol = self._parent.symbolTable.symbols[self.BlockName]["symbol"]
+        return symbol
+
 
     @property
     def BlockName(self):

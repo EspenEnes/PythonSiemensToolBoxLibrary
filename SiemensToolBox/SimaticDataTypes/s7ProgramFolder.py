@@ -64,6 +64,7 @@ class S7ProgrammFolder:
                     folder.name = row["NAME"].decode(self._encoding).strip()
                     folder.folder = fr"{self.projectFolder}\ombstx\offline\{int(row['ID']):08x}"
                     folder.ID = int(row["ID"])
+                    folder.symbolTable = self.symbolTable
                     self._blockOfflineFolder = folder
                     self._blockOfflineFolder_loaded = True
                     return folder

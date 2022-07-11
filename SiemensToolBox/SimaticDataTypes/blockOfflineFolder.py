@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from dbfread import DBF, DBFNotFound
 from .s7Types import BlockType
+from .symbolTable import SymbolTable
 from .blockInfo import BlockInfo
 from .blockBytes import BlockBytes
 
@@ -12,6 +13,7 @@ class BlockOfflineFolder:
     folder: str = field(init=True, default="", repr=False)
     _ID: int = field(init=True, default=None, repr=False)
     parent = None
+    symbolTable: SymbolTable = field(init=True, default=None, repr=False)
     _blockList: dict[BlockInfo] = field(init=True, default_factory=lambda: {}, repr=False)
     _blocklist_loaded: bool = field(init=True, default=False, repr=False)
     _retrevedblockbytes: dict = field(init=True, default_factory=lambda: {}, repr=False)
