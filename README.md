@@ -11,12 +11,12 @@ Parse DB layout to give adresses
 if __name__ == "__main__":
     projects = list()
 
-    for i, project in enumerate(Step7Finder.search()):
+    projects [project for project in Step7Finder.search()]:
         project.loadProject()
         projects.append(project)
 
 
-        if i > 10: break
+    
 
     z = projects[0]
     z.loadProject()
