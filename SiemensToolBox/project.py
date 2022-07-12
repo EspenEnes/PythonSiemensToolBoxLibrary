@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import codecs
 from .readProjectHeader import readProjectHeader
 import os
+import zipfile
 
 
 
@@ -26,9 +27,23 @@ class Project():
         if (not self.projectPath) and self.projectFile.lower().endswith(".s7p"):
             self.projectPath = os.path.split(self.projectFile)[0]
 
+
+
         if self.projectFile.endswith(".zip"):
             self.projectZipFile = self.projectFile
+            try:
+                with zipfile.ZipFile(self.projectZipFile, "r") as myzip:
+                    for zfile in myzip.infolist():
+                        if zfile.filename.endswith(".s7p"):
+
+                            with myzip.open(zfile) as myfile:
+                                self.projectName = readProjectHeader(myfile)
+            except (zipfile.error, PermissionError):
+                pass
             self.projectFile = None
+
+
+
 
 
 
