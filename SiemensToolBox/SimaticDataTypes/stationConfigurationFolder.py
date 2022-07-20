@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from . import StationType
+from .s7ProgramFolder import S7ProgrammFolder
 
 
 @dataclass
@@ -18,6 +19,17 @@ class StationConfigurationFolder:
         for module in self.modules:
             tmpInterfaces.append(module.NetworkInterfaces)
         return [val for sublist in tmpInterfaces for val in sublist]
+
+    @property
+    def blockOfflineFolders(self):
+        tmpFolders = list()
+        for module in self.modules:
+            if hasattr(module, "subItems"):
+                for item in module.subItems:
+                    if type(item) == S7ProgrammFolder:
+                        tmpFolders.append(item.blockOfflineFolder)
+        return tmpFolders
+
 
 
 

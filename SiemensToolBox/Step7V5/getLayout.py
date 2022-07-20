@@ -178,6 +178,9 @@ class Getlayout():
                 #we have a typechange into a array
                 if (item.group(2) != pitem.group(2)) and item.group(1).endswith("]") :
                     dirty = True
+                if item.group(1).endswith("]") and not pitem.group(1).endswith("]"):
+                    dirty = True
+
                 elif not dirty:
                     if item.group(2) == "BYTE":
                         if adress % 8 != 0:

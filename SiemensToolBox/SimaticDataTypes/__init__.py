@@ -7,3 +7,4 @@ from .s7ProgramFolder import S7ProgrammFolder
 from .blockOfflineFolder import BlockOfflineFolder
 from .symbolTable import SymbolTable
 from .blockInfo import BlockInfo
+from .functionBlockRow import S7FunctionBlockRow

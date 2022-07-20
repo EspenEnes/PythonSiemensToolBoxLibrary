@@ -1,8 +1,13 @@
 from dataclasses import dataclass, field
 from .s7Types import BlockType
 from .blockBytes import BlockBytes
-from dbfread import DBF
+from dbfread import DBF, FieldParser, InvalidValue
 from SiemensToolBox.Step7V5.getLayout import Getlayout
+from .functionBlockRow import S7FunctionBlockRow
+
+from dataclasses import dataclass, field
+
+
 
 
 @dataclass
@@ -19,8 +24,13 @@ class BlockInfo():
 
     @property
     def syblolName(self):
-        symbol = self._parent.symbolTable.symbols[self.BlockName]["symbol"]
-        return symbol
+        try:
+            symbol = self._parent.symbolTable.symbols[self.BlockName]["symbol"]
+        except KeyError:
+            symbol = ""
+        finally:
+            return symbol
+
 
 
     @property
@@ -36,14 +46,15 @@ class BlockInfo():
 
         blockbytes = BlockBytes()
 
+
         for row in self.bausteinDBF.records:
-            if not int(row["ID"]) == self.id:
+            if int(row["ID"]) != self.id:
                 continue
             if row["UDA"]:
                 blockbytes.uda = row["UDA"]
 
         for row in self.subblkDBF.records:
-            if not int(row["OBJECTID"]) == self.id:
+            if int(row["OBJECTID"]) != self.id:
                 continue
 
             mc5code = None
@@ -64,12 +75,12 @@ class BlockInfo():
                 if len(addinfo) > int(row["ADDLEN"]):
                     addinfo = addinfo.zfill(int(row["ADDLEN"]))
 
-            if blockbytes.CheckSum == 0:
-                if int(row["CHECKSUM"] != 0):
-                    blockbytes.CheckSum = int(row["CHECKSUM"])
+            if blockbytes.CheckSum == 0 and int(row["CHECKSUM"] != 0):
+                blockbytes.CheckSum = int(row["CHECKSUM"])
 
-            if row["SUBBLKTYP"] in [
-                BlockType.SDB.value, BlockType.OB.value, BlockType.FB.value, BlockType.SFC.value,
+
+            if int(row["SUBBLKTYP"]) in [
+                BlockType.FC.value, BlockType.OB.value, BlockType.FB.value, BlockType.SFC.value,
                 BlockType.SFB.value]:
 
                 if int(row["PASSWORD"]) == 3:
@@ -81,7 +92,7 @@ class BlockInfo():
                 blockbytes.nwinfo = addinfo
                 blockbytes.LastCodeChange = row["TIMESTAMP1"]
                 blockbytes.LastInterfaceChange = row["TIMESTAMP2"]
-                # blockbytes.BlockLanguage = PLCLanguage(int(row["BLKLANG"]))
+                # blockbytes.BlockLanguage = PLCLanguage(int(row["BLKLANG"])) #todo gjør konvertering i dataclass
 
 
             elif int(row["SUBBLKTYP"]) in [5, 3, 4, 7, 9]:
@@ -139,3 +150,28 @@ class BlockInfo():
         rows = [row.strip() for row in self.blockBytes.blkinterface.split("\n") if len(row.strip()) > 0]
         root = Getlayout(self._parent, rows)
         return root
+
+
+    def get_blockNetworks(self):
+        networks = list()
+
+        if not self.blockBytes.comments:
+            return None
+
+        cmt = bytearray(self.blockBytes.comments, "ISO-8859-1")
+
+        i = 0
+        while i < len(cmt) - 8:
+            cmt_len = cmt[i]
+            cmt_len_row = int(cmt[i + 3]) + (int(cmt[i + 4]) * 0x100)
+
+            if cmt[i + 5] == 0x06:
+                network = S7FunctionBlockRow()
+                cmt_start = int(cmt[i + 1])
+                network.name = cmt[i+6:((i+6)+(cmt_start-7))].decode("ISO-8859-1")
+                network.comment = cmt[i + cmt_start: (i + cmt_start) + (cmt_len_row - cmt_start-1)].decode("ISO-8859-1")
+                networks.append(network)
+                i += cmt_len_row
+            else:
+                i += cmt_len + 6
+        return networks
