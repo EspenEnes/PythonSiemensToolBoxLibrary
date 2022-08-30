@@ -151,12 +151,12 @@ class Getlayout():
             node.row_data.path = ".".join([str(_.name) for _ in node.path][1:])
 
             # start at even byte if struct change
-            if node.row_data.path[:-1] != old:
+            if ".".join(node.row_data.path.split(".")[:-1]) != old:
                 if adress % 8 != 0:
                     adress += (8 - (adress % 8))
                 if (adress // 8) % 2 != 0:
                     adress += 8
-                old = node.row_data.path[:-1]
+                old = ".".join(node.row_data.path.split(".")[:-1])
 
             # Add DB Adress to Node
             node.row_data.address = f"{adress // 8}.{adress % 8}"
