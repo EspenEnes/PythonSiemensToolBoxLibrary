@@ -124,9 +124,10 @@ class Getlayout():
 
                     # check if type is an struct and needs to be parsed out
                     if _type.strip() == "STRUCT":
-                        layout, layoutLen = self._structToDict(rows[_rowix:])
+
                         for x in range(int(array[1]), int(array[2]) + 1):
-                            root[item[1]][f"{x}"] = layout
+                            layout, layoutLen = self._structToDict(rows[_rowix:])#todo: do deep copy of dict
+                            root[item[1]][f"{x}"] = layout.copy()
                         _rowix += layoutLen
 
                     # check if type is an externalSorce like UDT, FB, SFB
