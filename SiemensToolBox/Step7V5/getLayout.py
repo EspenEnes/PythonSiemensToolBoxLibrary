@@ -10,9 +10,30 @@ from dataclasses import dataclass
 class Row():
     name = None
     path = None
-    type = None
+    _type = ""
+    typeValue = None
     comment = None
     address = None
+
+    @property
+    def type_(self):
+        return self._type
+
+    @type_.setter
+    def type_(self, value):
+        data = value.split(":=")
+        if len(data) > 1:
+            self._type = data[0].strip()
+            self.typeValue = data[1]
+        else:
+            self._type = value.strip()
+
+
+
+
+
+
+
 
 
 class MyNode(Node):
@@ -62,11 +83,31 @@ class Getlayout():
             elif _struct := re.compile("^STRUCT").search(rows[_rowix]):
                 _rowix += 1
 
+            elif rows[_rowix] == "VAR_INPUT":
+                root["in"], layoutLen = self._structToDict(rows[_rowix + 1:])
+                _rowix += layoutLen + 1
+
+            elif rows[_rowix] == "VAR_OUTPUT":
+                root["out"], layoutLen = self._structToDict(rows[_rowix + 1:])
+                _rowix += layoutLen + 1
+
+            elif rows[_rowix] == "VAR_IN_OUT":
+                root["inout"] = OrderedDict()
+                data, len_data = self._structToDict(rows[_rowix + 1:])
+                for key, value in data.items():
+                    row = Row()
+                    row.name = key
+                    row.type_ = "POINTER"
+                    root["inout"][key] = row
+                _rowix += len_data + 1
+
+
+
             elif item := re.compile("(^\w+)\s+:\s+(.*)").search(rows[_rowix]):
 
                 # check if type is an externalSorce like UDT, FB, SFB
                 if ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(item[2]):
-                    root[item[1]] = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout
+                    root[item[1]] = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout.copy()
                     _rowix += 1
 
                 # check if type is an array
@@ -89,8 +130,8 @@ class Getlayout():
                         _rowix += layoutLen
 
                     # check if type is an externalSorce like UDT, FB, SFB
-                    elif ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(item[2]):
-                        layout = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout
+                    elif ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(_type):
+                        layout = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout.copy()
                         for x in range(int(array[1]), int(array[2]) + 1):
                             root[item[1]][f"{x}"] = layout
 
@@ -99,7 +140,7 @@ class Getlayout():
                         for x in range(int(array[1]), int(array[2]) + 1):
                             row = Row()
                             row.name = x
-                            row.type = _type.replace(";", "").strip()
+                            row.type_ = _type.replace(";", "").strip()
                             if len(item[2].split("//")) > 1:
                                 row.comment = item[2].split("//")[1].strip()
 
@@ -109,7 +150,7 @@ class Getlayout():
                 else:
                     row = Row()
                     row.name = item[1]
-                    row.type = item[2].split("//")[0].strip().replace(";", "").strip()
+                    row.type_ = item[2].split("//")[0].strip().replace(";", "").strip()
                     if len(item[2].split("//")) > 1:
                         row.comment = item[2].split("//")[1].strip()
                     root[item[1]] = row
@@ -131,6 +172,7 @@ class Getlayout():
         return root, _rowix
 
     def _dictToNodeTree(self, dict: OrderedDict, root):
+
         for key, value in dict.items():
             if type(value) == OrderedDict:
                 self._dictToNodeTree(value, MyNode(key, root))
@@ -145,13 +187,22 @@ class Getlayout():
 
         Types = {"BOOL": 1, "BYTE": 8, "WORD": 16, "DWORD": 32, "INT": 16, "DINT": 32, "REAL": 32, "S5TIME": 16,
                  "TIME": 32,
-                 "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64}
+                 "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64, "BLOCK_DB": 2, "POINTER": 48}
 
         for node in root.leaves:
+
+            # check if leaf has row_data atribute
+            if not hasattr(node, "row_data"):
+                continue
+
             node.row_data.path = ".".join([str(_.name) for _ in node.path][1:])
 
+
+
+
+
             # start at even byte if struct change
-            if ".".join(node.row_data.path.split(".")[:-1]) != old:
+            if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.type_ not in ["BOOL", "BYTE"]:
                 if adress % 8 != 0:
                     adress += (8 - (adress % 8))
                 if (adress // 8) % 2 != 0:
@@ -162,11 +213,12 @@ class Getlayout():
             node.row_data.address = f"{adress // 8}.{adress % 8}"
 
             # Increement adress
-            if node.row_data.type.startswith('STRING'):
-                size = re.compile(".*\[(\d+)\s]").search(node.row_data.type)[1]
+            if node.row_data.type_.startswith('STRING'):
+                size = re.compile(".*\[(\d+)\s]").search(node.row_data.type_)[1]
                 adress += int((int(Types.get('STRING')) * int(size) + 16))
             else:
-                adress += int(Types.get(node.row_data.type))
+                adress += int(Types.get(node.row_data.type_))
+
 
     @property
     def layout(self):
@@ -174,6 +226,13 @@ class Getlayout():
 
     @property
     def dbLayout(self):
-        return  [(node.row_data.address, node.row_data.path, node.row_data.type) for node in self.nodeTree.leaves]
+        output = []
+        for node in self.nodeTree.leaves:
+            if hasattr(node, "row_data"):
+                output.append((node.row_data.address, node.row_data.path, node.row_data.type_))
+
+
+
+        return output
 
 
