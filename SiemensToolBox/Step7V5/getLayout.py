@@ -10,23 +10,23 @@ from dataclasses import dataclass
 class Row():
     name = None
     path = None
-    _type = ""
-    typeValue = None
+    _dataType = ""
+    initialValue = None
     comment = None
     address = None
 
     @property
-    def type_(self):
-        return self._type
+    def dataType(self):
+        return self._dataType
 
-    @type_.setter
-    def type_(self, value):
-        data = value.split(":=")
+    @dataType.setter
+    def dataType(self, value):
+        data = data.split(":=")
         if len(data) > 1:
-            self._type = data[0].strip()
-            self.typeValue = data[1]
+            self._dataType = data[0].strip()
+            self.initialValue = data[1]
         else:
-            self._type = value.strip()
+            self._dataType = value.strip()
 
 
 
@@ -97,7 +97,7 @@ class Getlayout():
                 for key, value in data.items():
                     row = Row()
                     row.name = key
-                    row.type_ = "POINTER"
+                    row.dataType = "POINTER"
                     root["inout"][key] = row
                 _rowix += len_data + 1
 
@@ -119,7 +119,7 @@ class Getlayout():
                         _type = array[3].split("//")[0]
                         _rowix += 1
                     else:
-                        _type = rows[_rowix + 1].replace(";", "").strip()
+                        _type = rows[_rowix + 1].replace(";", "").strip().split("\t")[0]
                         _rowix += 2
 
                     # check if type is an struct and needs to be parsed out
@@ -140,7 +140,7 @@ class Getlayout():
                         for x in range(int(array[1]), int(array[2]) + 1):
                             row = Row()
                             row.name = x
-                            row.type_ = _type.replace(";", "").strip()
+                            row.dataType = _type.replace(";", "").strip()
                             if len(item[2].split("//")) > 1:
                                 row.comment = item[2].split("//")[1].strip()
 
@@ -150,7 +150,7 @@ class Getlayout():
                 else:
                     row = Row()
                     row.name = item[1]
-                    row.type_ = item[2].split("//")[0].strip().replace(";", "").strip()
+                    row.dataType = item[2].split("//")[0].strip().replace(";", "").strip()
                     if len(item[2].split("//")) > 1:
                         row.comment = item[2].split("//")[1].strip()
                     root[item[1]] = row
@@ -202,7 +202,7 @@ class Getlayout():
 
 
             # start at even byte if struct change
-            if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.type_ not in ["BOOL", "BYTE"]:
+            if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.dataType not in ["BOOL", "BYTE"]:
                 if adress % 8 != 0:
                     adress += (8 - (adress % 8))
                 if (adress // 8) % 2 != 0:
@@ -213,11 +213,11 @@ class Getlayout():
             node.row_data.address = f"{adress // 8}.{adress % 8}"
 
             # Increement adress
-            if node.row_data.type_.startswith('STRING'):
-                size = re.compile(".*\[(\d+)\s]").search(node.row_data.type_)[1]
+            if node.row_data.dataType.startswith('STRING'):
+                size = re.compile(".*\[(\d+)\s]").search(node.row_data.dataType)[1]
                 adress += int((int(Types.get('STRING')) * int(size) + 16))
             else:
-                adress += int(Types.get(node.row_data.type_))
+                adress += int(Types.get(node.row_data.dataType))
 
 
     @property
@@ -229,7 +229,7 @@ class Getlayout():
         output = []
         for node in self.nodeTree.leaves:
             if hasattr(node, "row_data"):
-                output.append((node.row_data.address, node.row_data.path, node.row_data.type_))
+                output.append((node.row_data.address, node.row_data.path, node.row_data.dataType))
 
 
 
