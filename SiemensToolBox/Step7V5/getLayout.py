@@ -21,7 +21,7 @@ class Row():
 
     @dataType.setter
     def dataType(self, value):
-        data = data.split(":=")
+        data = value.split(":=")
         if len(data) > 1:
             self._dataType = data[0].strip()
             self.initialValue = data[1]
