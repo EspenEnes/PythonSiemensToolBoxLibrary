@@ -98,7 +98,12 @@ class Getlayout():
                 for key, value in data.items():
                     row = Row()
                     row.name = key
-                    row.dataType = "POINTER"
+                    row.dataType = "POINTER"   #todo Not all Inouts was poiters
+                    if value in  ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME","DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME", "BLOCK_DB"]:
+                        row.dataType = value
+
+
+
                     root["inout"][key] = row
                 _rowix += len_data + 1
 
