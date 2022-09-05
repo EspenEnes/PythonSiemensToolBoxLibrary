@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
 from typing import Tuple, Any
+from copy import deepcopy
 
 from anytree import Node, RenderTree
 from dataclasses import dataclass
@@ -107,7 +108,7 @@ class Getlayout():
 
                 # check if type is an externalSorce like UDT, FB, SFB
                 if ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(item[2]):
-                    root[item[1]] = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout.copy()
+                    root[item[1]] = deepcopy(self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout)
                     _rowix += 1
 
                 # check if type is an array
@@ -132,7 +133,7 @@ class Getlayout():
 
                     # check if type is an externalSorce like UDT, FB, SFB
                     elif ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(_type):
-                        layout = self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout.copy()
+                        layout = deepcopy(self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout)
                         for x in range(int(array[1]), int(array[2]) + 1):
                             root[item[1]][f"{x}"] = layout
 
