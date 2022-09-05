@@ -99,8 +99,8 @@ class Getlayout():
                     row = Row()
                     row.name = key
                     row.dataType = "POINTER"   #todo Not all Inouts was poiters
-                    if value in  ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME","DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME", "BLOCK_DB"]:
-                        row.dataType = value
+                    if value.dataType in  ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME","DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME", "BLOCK_DB"]:
+                        row.dataType = value.dataType
 
 
 
