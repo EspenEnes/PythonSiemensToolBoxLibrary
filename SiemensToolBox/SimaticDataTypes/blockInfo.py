@@ -1,10 +1,7 @@
-from dataclasses import dataclass, field
 from .s7Types import BlockType
 from .blockBytes import BlockBytes
-from dbfread import DBF, FieldParser, InvalidValue
 from SiemensToolBox.Step7V5.getLayout import Getlayout
 from .functionBlockRow import S7FunctionBlockRow
-
 from dataclasses import dataclass, field
 
 
@@ -12,7 +9,9 @@ from dataclasses import dataclass, field
 
 @dataclass
 class BlockInfo():
-    id: int = field(init=True, repr=False)
+    rowData: any = field(init=True, repr=False)
+    _parent: any = field(init=True, repr=False)
+    id: int = field(init=False,default=None, repr=False)
     blockType: BlockType = field(init=True, default=None, repr=True)
     blockNumber: int = field(init=True, default=None, repr=True)
     name: str = field(init=True, default=False, repr=False)
@@ -20,7 +19,34 @@ class BlockInfo():
     knowHowProtection: bool = field(init=True, default=False, repr=False)
     isInstance: bool = field(init=True, default=False, repr=False)
     _folder: str = field(init=True, default=None, repr=False)
-    _parent: any = field(init=True, default=None, repr=False)
+    _blockbytes : BlockBytes = field(init=True, default=None, repr=False)
+    _subBlocks : list = field(init=True, default_factory=lambda : [])
+
+    def __post_init__(self):
+        self.id = int(self.rowData["ID"])
+        self._folder = self._parent.folder
+        self.blockNumber = int(self.rowData["NUMMER"])
+        self.blockType = BlockType(int(self.rowData["TYP"]))
+
+
+    @property
+    def subBlocks(self):
+        return self._subBlocks
+
+    @subBlocks.setter
+    def subBlocks(self, value):
+        for row in value:
+            if int(row["SUBBLKTYP"]) in [BlockType.FC.value, BlockType.OB.value, BlockType.FB.value,
+                                         BlockType.SFC.value]:
+                self.name = row["BLOCKNAME"].strip('\x00')
+                self.family = row["BLOCKFNAME"].strip('\x00')
+
+                if int(row["SUBBLKTYP"]) != BlockType.SFC.value:
+                    if int(row["PASSWORD"]) == 3:
+                        self.knowHowProtection = True
+        self._subBlocks = value
+
+
 
     @property
     def syblolName(self):
@@ -39,23 +65,18 @@ class BlockInfo():
 
     @property
     def blockBytes(self):
-        if not hasattr(self, "bausteinDBF"):
-            self.bausteinDBF = DBF(f"{self._folder}\\BAUSTEIN.DBF", encoding="ISO-8859-1")
-        if not hasattr(self, "subblkDBF"):
-            self.subblkDBF = DBF(f"{self._folder}\\SUBBLK.DBF", encoding="ISO-8859-1")
+        if self._blockbytes:
+            return self._blockbytes
 
         blockbytes = BlockBytes()
 
+        try:
+            blockbytes.uda = self.rowData["UDA"]
+        except KeyError:
+            pass
 
-        for row in self.bausteinDBF.records:
-            if int(row["ID"]) != self.id:
-                continue
-            if row["UDA"]:
-                blockbytes.uda = row["UDA"]
 
-        for row in self.subblkDBF.records:
-            if int(row["OBJECTID"]) != self.id:
-                continue
+        for row in self.subBlocks:
 
             mc5code = None
             if row["MC5CODE"] is not None:
@@ -142,6 +163,7 @@ class BlockInfo():
 
             elif int(row["SUBBLKTYP"]) == 38:
                 blockbytes.comments = mc5code
+        self._blockbytes = blockbytes
         return blockbytes
 
     @property

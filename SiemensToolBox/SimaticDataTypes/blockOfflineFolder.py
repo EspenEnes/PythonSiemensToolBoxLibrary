@@ -4,7 +4,7 @@ from dbfread import DBF, DBFNotFound
 from .s7Types import BlockType
 from .symbolTable import SymbolTable
 from .blockInfo import BlockInfo
-from .blockBytes import BlockBytes
+
 
 
 @dataclass
@@ -61,42 +61,35 @@ class BlockOfflineFolder:
         retval = {}
 
         try:
-            bausteinDBF = DBF(f"{self.folder}\\BAUSTEIN.DBF", raw=True)
-            subblkDBF = DBF(f"{self.folder}\\SUBBLK.DBF", raw=True)
+            self.bausteinDBF = DBF(f"{self.folder}\\BAUSTEIN.DBF", encoding=self._encoding, load=True).records
+            self.subblkDBF = DBF(f"{self.folder}\\SUBBLK.DBF", encoding=self._encoding, load=True).records
         except DBFNotFound:
             return blocks
 
-        for row in bausteinDBF.records:
-            if int(row["TYP"]) in [BlockType.SFB.value, BlockType.SFC.value, BlockType.SDB.value,
-                                   BlockType.DB.value,
-                                   BlockType.VAT.value, BlockType.FB.value, BlockType.FC.value,
-                                   BlockType.OB.value,
-                                   BlockType.UDT.value]:
-                tmp = BlockInfo(int(row["ID"]))
-                tmp._folder = self.folder
-                tmp._parent = self
-                tmp.blockNumber = int(row["NUMMER"])
-                tmp.blockType = BlockType(int(row["TYP"]))
-                blocks[int(row["ID"])] = tmp
+        validTypes = [BlockType.SFB.value, BlockType.SFC.value, BlockType.SDB.value,
+                      BlockType.DB.value,
+                      BlockType.VAT.value, BlockType.FB.value, BlockType.FC.value,
+                      BlockType.OB.value,
+                      BlockType.UDT.value]
 
-        typ = [BlockType.FC.value, BlockType.OB.value, BlockType.FB.value, BlockType.SFC.value]
+        blocks = {int(row["ID"]): BlockInfo(row, self) for row in self.bausteinDBF if
+                  int(row["TYP"]) in validTypes}
 
-        for row in subblkDBF.records:
+        output = {}
+        self.subblkDBF: list[dict]
+        for row in self.subblkDBF:
+            if row["OBJECTID"] not in output:
+                output[row["OBJECTID"]] = []
+            output[row["OBJECTID"]].append(row)
+
+        for key, value in output.items():
             try:
-                block = blocks[int(row["OBJECTID"])]
-                if int(row["SUBBLKTYP"]) in typ:
-                    block.name = row["BLOCKNAME"].decode(self._encoding).strip('\x00')
-                    block.family = row["BLOCKFNAME"].decode(self._encoding).strip('\x00')
-
-                    if int(row["SUBBLKTYP"]) != BlockType.SFC.value:
-                        if int(row["PASSWORD"]) == 3:
-                            block.knowHowProtection = True
+                block = blocks[key]
+                block.subBlocks = value
+                retval[block.BlockName] = block
             except KeyError:
-                continue
-
-            retval[block.BlockName] = block
+                pass
 
         self._blockList = retval
         self._blocklist_loaded = True
-        return retval
-
+        return self._blockList
