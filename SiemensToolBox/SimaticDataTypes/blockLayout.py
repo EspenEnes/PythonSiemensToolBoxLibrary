@@ -5,7 +5,7 @@ from .blockItem import BlockItem
 @dataclass
 class BlockLayout():
     rows: list = field(init=True)
-    items: list = field(init=True, default_factory=lambda : ())
+    items: list = field(init=True, default_factory=lambda: ())
 
     def __post_init__(self):
         _rowix = 0
@@ -26,20 +26,6 @@ class BlockLayout():
 
                     item.name = f"{name}.{item.name}"
                     self.items.append(item)
-                    print(item)
                     _rowix += 1
 
-
-
-
-
-
-
-
-
             _rowix += 1
-
-
-
-
-

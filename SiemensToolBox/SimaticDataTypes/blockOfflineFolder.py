@@ -6,7 +6,6 @@ from .symbolTable import SymbolTable
 from .blockInfo import BlockInfo
 
 
-
 @dataclass
 class BlockOfflineFolder:
     name: str = field(init=True, default="", repr=True)
@@ -60,9 +59,10 @@ class BlockOfflineFolder:
         blocks = {}
         retval = {}
 
+        # Try and load Baustein and SubBlock from DBF
         try:
-            self.bausteinDBF = DBF(f"{self.folder}\\BAUSTEIN.DBF", encoding=self._encoding, load=True).records
-            self.subblkDBF = DBF(f"{self.folder}\\SUBBLK.DBF", encoding=self._encoding, load=True).records
+            bausteinDBF = DBF(f"{self.folder}\\BAUSTEIN.DBF", encoding=self._encoding, load=True)
+            subblkDBF = DBF(f"{self.folder}\\SUBBLK.DBF", encoding=self._encoding, load=True)
         except DBFNotFound:
             return blocks
 
@@ -72,17 +72,19 @@ class BlockOfflineFolder:
                       BlockType.OB.value,
                       BlockType.UDT.value]
 
-        blocks = {int(row["ID"]): BlockInfo(row, self) for row in self.bausteinDBF if
+        # Find all Buildingblocks that are of valid types
+        blocks = {int(row["ID"]): BlockInfo(row, self) for row in bausteinDBF.records if
                   int(row["TYP"]) in validTypes}
 
-        output = {}
-        self.subblkDBF: list[dict]
-        for row in self.subblkDBF:
-            if row["OBJECTID"] not in output:
-                output[row["OBJECTID"]] = []
-            output[row["OBJECTID"]].append(row)
+        # Group together SubBlocks with equal "OBJECT ID
+        subBlocks = {}
+        for row in subblkDBF.records:
+            if row["OBJECTID"] not in subBlocks:
+                subBlocks[row["OBJECTID"]] = []
+            subBlocks[row["OBJECTID"]].append(row)
 
-        for key, value in output.items():
+        # Merge SubBlocks with BuildingBlocks
+        for key, value in subBlocks.items():
             try:
                 block = blocks[key]
                 block.subBlocks = value

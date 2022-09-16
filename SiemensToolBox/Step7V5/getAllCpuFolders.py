@@ -9,7 +9,6 @@ import os
 def getAllCpuFolders(projectFolder, stations, encoder):
     cpufolders = {}
     encoding = encoder[0].name
-    print(encoding)
 
 
     """CPU MpiDp 300 Folders"""
@@ -28,8 +27,6 @@ def getAllCpuFolders(projectFolder, stations, encoder):
                     cpu.ID = int(row["SOBJID"])
                     cpu.parent = station
                     station.modules.append(cpu)
-
-                   # print(station.modules)
                     cpufolders[cpu.ID] = cpu
 
     """CPU 300 ET200s Folders"""

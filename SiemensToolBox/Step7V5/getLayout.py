@@ -30,13 +30,6 @@ class Row():
             self._dataType = value.strip()
 
 
-
-
-
-
-
-
-
 class MyNode(Node):
     separator = "."
 
@@ -56,10 +49,10 @@ class Getlayout():
         if not self._nodeTree:
             rootNode = MyNode("root")
 
-            #construct nodetree
+            # construct nodetree
             self._nodeTree = self._dictToNodeTree(self.root, rootNode)
 
-            #Concatinate DB addresses to node leaves
+            # Concatinate DB addresses to node leaves
             self.getPlcAdress(self._nodeTree)
         return self._nodeTree
 
@@ -98,11 +91,13 @@ class Getlayout():
                 for key, value in data.items():
                     row = Row()
                     row.name = key
-                    row.dataType = "POINTER"   #todo Not all Inouts was poiters
-                    if value.dataType in  ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME","DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME", "BLOCK_DB"]:
-                        row.dataType = value.dataType
-
-
+                    if type(value) == OrderedDict:
+                        row.dataType = "POINTER"
+                    else:
+                        if value.dataType in ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME",
+                                              "DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME",
+                                              "BLOCK_DB"]:
+                            row.dataType = value.dataType
 
                     root["inout"][key] = row
                 _rowix += len_data + 1
@@ -113,7 +108,8 @@ class Getlayout():
 
                 # check if type is an externalSorce like UDT, FB, SFB
                 if ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(item[2]):
-                    root[item[1]] = deepcopy(self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout)
+                    root[item[1]] = deepcopy(
+                        self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout)
                     _rowix += 1
 
                 # check if type is an array
@@ -132,7 +128,7 @@ class Getlayout():
                     if _type.strip() == "STRUCT":
 
                         for x in range(int(array[1]), int(array[2]) + 1):
-                            layout, layoutLen = self._structToDict(rows[_rowix:])#todo: do deep copy of dict
+                            layout, layoutLen = self._structToDict(rows[_rowix:])  # todo: do deep copy of dict
                             root[item[1]][f"{x}"] = layout.copy()
                         _rowix += layoutLen
 
@@ -194,7 +190,8 @@ class Getlayout():
 
         Types = {"BOOL": 1, "BYTE": 8, "WORD": 16, "DWORD": 32, "INT": 16, "DINT": 32, "REAL": 32, "S5TIME": 16,
                  "TIME": 32,
-                 "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64, "BLOCK_DB": 2, "POINTER": 48}
+                 "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64, "BLOCK_DB": 2,
+                 "POINTER": 48}
 
         for node in root.leaves:
 
@@ -203,10 +200,6 @@ class Getlayout():
                 continue
 
             node.row_data.path = ".".join([str(_.name) for _ in node.path][1:])
-
-
-
-
 
             # start at even byte if struct change
             if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.dataType not in ["BOOL", "BYTE"]:
@@ -226,7 +219,6 @@ class Getlayout():
             else:
                 adress += int(Types.get(node.row_data.dataType))
 
-
     @property
     def layout(self):
         return self.root
@@ -238,8 +230,4 @@ class Getlayout():
             if hasattr(node, "row_data"):
                 output.append((node.row_data.address, node.row_data.path, node.row_data.dataType))
 
-
-
         return output
-
-
