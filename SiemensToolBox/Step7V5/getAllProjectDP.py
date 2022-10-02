@@ -1,4 +1,5 @@
 from dbfread import DBF
+from dbfread.exceptions import DBFNotFound
 from SiemensToolBox.SimaticDataTypes import PLCType, CpFolder
 from dataclasses import dataclass
 
@@ -36,29 +37,32 @@ def getAllDPfolders(projectFolder):
 
 #//Get The ProfiBus and MPI
     dpList = dict()
-    dbf =  DBF(f"{projectFolder}\\hOmSave7\\s7hkdmax\\HOBJECT1.DBF", raw=True)
+    try:
+        dbf =  DBF(f"{projectFolder}\\hOmSave7\\s7hkdmax\\HOBJECT1.DBF", raw=True)
 
-    for row in dbf.records:
+        for row in dbf.records:
 
-        dp = DpHelp()
-        dp.ID = int(row["ID"])
-        dpList[int(row["ID"])] = dp
+            dp = DpHelp()
+            dp.ID = int(row["ID"])
+            dpList[int(row["ID"])] = dp
 
-    dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hkdmax\\HRELATI1.DBF")
-    for row in dbf.records:
-        if int(row["RELID"]) == 1315837: #RelToCPU
-            try:
-                DP = dpList[int(row["SOBJID"])]
-                DP.TobjID = (int(row["TOBJID"]))
-            except KeyError:
-                pass
-
-        elif int(row["RELID"]) == 64:
-            try:
-                DP = dpList[int(row["SOBJID"])]
-                DP.addr = (int(row["TOBJID"]))
-            except KeyError:
-                pass
+        dbf = DBF(f"{projectFolder}\\hOmSave7\\s7hkdmax\\HRELATI1.DBF")
+        for row in dbf.records:
+            if int(row["RELID"]) == 1315837: #RelToCPU
+                try:
+                    DP = dpList[int(row["SOBJID"])]
+                    DP.TobjID = (int(row["TOBJID"]))
+                except KeyError:
+                    pass
+        
+            elif int(row["RELID"]) == 64:
+                try:
+                    DP = dpList[int(row["SOBJID"])]
+                    DP.addr = (int(row["TOBJID"]))
+                except KeyError:
+                    pass
+    except DBFNotFound:
+        pass
 #//remove DP from DPlist to DPFolder
     for dp in dpList.values():
         try:
