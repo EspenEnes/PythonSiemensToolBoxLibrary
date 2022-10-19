@@ -1,5 +1,7 @@
 # PythonSiemensToolBoxLibrary
 
+Install: python -m pip install git+https://github.com/EspenEnes/PythonSiemensToolBoxLibrary
+
 Searches for step7 projects in a given folder archived or unpacked with Step7Finder.
 Reads project header without unpacking zip
 
