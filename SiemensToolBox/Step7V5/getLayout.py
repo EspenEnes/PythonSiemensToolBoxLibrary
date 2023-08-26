@@ -94,7 +94,7 @@ class Getlayout():
                     if type(value) == OrderedDict:
                         row.dataType = "POINTER"
                     else:
-                        if value.dataType in ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME",
+                        if value.dataType in ["BOOL", "BYTE", "WORD", "DWORD", "INT", "DINT", "REAL", "S5TIME", "TIME", "TIMER",
                                               "DATE", "TIME_OF:DAY", "CHAR", "STRING", "ANY", "DATE_AND_TIME",
                                               "BLOCK_DB"]:
                             row.dataType = value.dataType
@@ -189,7 +189,7 @@ class Getlayout():
         old = None
 
         Types = {"BOOL": 1, "BYTE": 8, "WORD": 16, "DWORD": 32, "INT": 16, "DINT": 32, "REAL": 32, "S5TIME": 16,
-                 "TIME": 32,
+                 "TIME": 32, "TIMER": 16,
                  "DATE": 16, "TIME_OF:DAY": 32, "CHAR": 8, "STRING": 8, "ANY": 80, "DATE_AND_TIME": 64, "BLOCK_DB": 2,
                  "POINTER": 48}
 
