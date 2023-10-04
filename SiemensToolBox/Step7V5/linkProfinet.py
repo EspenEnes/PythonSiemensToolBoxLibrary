@@ -20,7 +20,7 @@ def linkProfinetWithCpuCp(projectFolder, cpuFolders, cpFolders, networkInterface
         elif int(row["OBJTYP"]) in [2364971, 2367589]:
             if int(row["UNITID"]) in cpFolders:
                 cp = cpFolders[int(row["UNITID"])]
-                cp.idTobjId.append(int[row["ID"]])
+                cp.idTobjId.append(int(row["ID"]))
 
 
 
