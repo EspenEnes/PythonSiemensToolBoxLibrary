@@ -154,6 +154,7 @@ class Getlayout():
                     row = Row()
                     row.name = item[1]
                     row.dataType = item[2].split("//")[0].strip().replace(";", "").strip()
+                    row.dataType = row.dataType.split("\t")[0].strip()
                     if len(item[2].split("//")) > 1:
                         row.comment = item[2].split("//")[1].strip()
                     root[item[1]] = row
