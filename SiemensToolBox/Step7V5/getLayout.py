@@ -129,14 +129,14 @@ class Getlayout():
 
                         for x in range(int(array[1]), int(array[2]) + 1):
                             layout, layoutLen = self._structToDict(rows[_rowix:])  # todo: do deep copy of dict
-                            root[item[1]][f"{x}"] = layout.copy()
+                            root[item[1]][f"{x}"] = deepcopy(layout)
                         _rowix += layoutLen
 
                     # check if type is an externalSorce like UDT, FB, SFB
                     elif ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(_type):
                         layout = deepcopy(self._parent.getBlockLayout(f"{ExternalSource[1]}{ExternalSource[2]}").layout)
                         for x in range(int(array[1]), int(array[2]) + 1):
-                            root[item[1]][f"{x}"] = layout
+                            root[item[1]][f"{x}"] = deepcopy(layout)
 
                     # Add Type
                     else:
