@@ -106,6 +106,7 @@ class Getlayout():
 
             elif item := re.compile("(^\w+)\s+:\s+(.*)").search(rows[_rowix]):
 
+
                 # check if type is an externalSorce like UDT, FB, SFB
                 if ExternalSource := re.compile("^(UDT*|FB*|SFB*)+\s(\d+)").search(item[2]):
                     root[item[1]] = deepcopy(
@@ -149,6 +150,26 @@ class Getlayout():
 
                             root[item[1]][f"{x}"] = row
 
+
+
+                elif multi_array := re.compile("^ARRAY\s+\[(\d+)\s+..\s+(\d+),\s+(\d+)\s+..\s+(\d+)\s+]\s+OF\s(.*)").search(item[2]):
+                    root[item[1]] = OrderedDict()
+
+                    if len(multi_array[5].split("//")[0]) > 0:
+                        _type = array[5].split("//")[0]
+                        _rowix += 1
+                    else:
+                        _type = rows[_rowix + 1].replace(";", "").strip().split("\t")[0]
+                        _rowix += 2
+
+                    for x in range(int(multi_array[1]), int(multi_array[2]) + 1):
+                        for y in range(int(multi_array[3]), int(multi_array[4]) + 1):
+                            row = Row()
+                            row.name = f"{x}.{y}"
+                            if len(multi_array[5].split("//")) > 1:
+                                row.comment = multi_array[5].split("//")[1].strip()
+                            row.dataType = _type.replace(";", "").strip()
+                            root[item[1]][f"{x}.{y}"] = row
                 # Add Type
                 else:
                     row = Row()
@@ -159,6 +180,8 @@ class Getlayout():
                         row.comment = item[2].split("//")[1].strip()
                     root[item[1]] = row
                     _rowix += 1
+
+
 
             # Return  Struct
             elif rows[_rowix] == "END_STRUCT;" or rows[_rowix] == "END_VAR" or rows[_rowix] == "END_STRUCT ;" or rows[
