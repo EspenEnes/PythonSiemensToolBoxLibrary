@@ -211,6 +211,7 @@ class Getlayout():
     def getPlcAdress(self, root: MyNode):
         adress = 0
         old = None
+        in_a_struct = False
 
         Types = {"BOOL": 1, "BYTE": 8, "WORD": 16, "DWORD": 32, "INT": 16, "DINT": 32, "REAL": 32, "S5TIME": 16,
                  "TIME": 32, "TIMER": 16,
@@ -231,7 +232,8 @@ class Getlayout():
             if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.dataType not in ["BOOL", "BYTE"]:
                 if ( len(node.row_data.path.split(".")) >= 2 and
                         ".".join(node.row_data.path.split(".")[-2]).isdigit() and
-                        ".".join(node.row_data.path.split(".")[-1]).isdigit()):
+                        ".".join(node.row_data.path.split(".")[-1]).isdigit() and
+                        old.split(".")[-1].isdigit()):
 
                     if ".".join(node.row_data.path.split(".")[-2]) != ".".join(old.split(".")[-1]):
                         if adress % 8 != 0:
