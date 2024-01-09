@@ -229,7 +229,7 @@ class Getlayout():
             if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.dataType not in ["BOOL", "BYTE"]:
 
 
-                if len(node.row_data.path.split(".")) > 2 and node.row_data.path.split(".")[-2].isdigit() and node.row_data.path.split(".")[-1].isdigit():
+                if len(node.row_data.path.split(".")) > 1 and node.row_data.path.split(".")[-2].isdigit() and node.row_data.path.split(".")[-1].isdigit():
                     if ".".join(node.row_data.path.split(".")[:-1]) != ".".join(old.split(".")):
                         if adress % 8 != 0:
                             adress += (8 - (adress % 8))
