@@ -211,7 +211,6 @@ class Getlayout():
     def getPlcAdress(self, root: MyNode):
         adress = 0
         old = None
-        in_a_struct = False
 
         Types = {"BOOL": 1, "BYTE": 8, "WORD": 16, "DWORD": 32, "INT": 16, "DINT": 32, "REAL": 32, "S5TIME": 16,
                  "TIME": 32, "TIMER": 16,
@@ -219,6 +218,7 @@ class Getlayout():
                  "POINTER": 48}
 
         for node in root.leaves:
+            in_a_struct = False
 
             # check if leaf has row_data atribute
             if not hasattr(node, "row_data"):
@@ -226,22 +226,23 @@ class Getlayout():
 
             node.row_data.path = ".".join([str(_.name) for _ in node.path][1:])
 
-
-
             # start at even byte if struct change
             if ".".join(node.row_data.path.split(".")[:-1]) != old or node.row_data.dataType not in ["BOOL", "BYTE"]:
-                if ( len(node.row_data.path.split(".")) >= 2 and
-                        ".".join(node.row_data.path.split(".")[-2]).isdigit() and
-                        ".".join(node.row_data.path.split(".")[-1]).isdigit() and
-                        old.split(".")[-1].isdigit()):
 
-                    if ".".join(node.row_data.path.split(".")[-2]) != ".".join(old.split(".")[-1]):
+                if len(node.row_data.path.split(".")) >= 2:
+                    last = ".".join(node.row_data.path.split(".")[-1])
+                    last2 = ".".join(node.row_data.path.split(".")[-2])
+                    last3 = ".".join(node.row_data.path.split(".")[:-3])
+
+                    if last.isdigit() and last2.isdigit() and not (last3 != ".".join(old.split(".")[:-2])):
                         if adress % 8 != 0:
                             adress += (8 - (adress % 8))
+                    else:
+                        if adress % 8 != 0:
+                            adress += (8 - (adress % 8))
+                        if (adress // 8) % 2 != 0:
+                            adress += 8
                 else:
-
-
-
                     if adress % 8 != 0:
                         adress += (8 - (adress % 8))
                     if (adress // 8) % 2 != 0:
