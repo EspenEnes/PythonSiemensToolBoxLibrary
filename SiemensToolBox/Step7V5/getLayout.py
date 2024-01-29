@@ -156,7 +156,7 @@ class Getlayout():
                     root[item[1]] = OrderedDict()
 
                     if len(multi_array[5].split("//")[0]) > 0:
-                        _type = array[5].split("//")[0]
+                        _type = multi_array[5].split("//")[0]
                         _rowix += 1
                     else:
                         _type = rows[_rowix + 1].replace(";", "").strip().split("\t")[0]
